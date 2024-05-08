@@ -12,7 +12,7 @@ cur.execute('''CREATE TABLE IF NOT EXISTS users
 
 # Insert some data
 cur.execute("INSERT INTO users (name, age) VALUES (?, ?)", ('Alice', 30))
-cur.execute("INSERT INTO users (name, age) VALUES (?, ?)", ('Bob', 25))
+cur.execute("INSERT INTO users (name, age) VALUES (?, ?)", ('Bob', 25), ('loa', 33))
 cur.execute("INSERT INTO users (name, age) VALUES (?, ?)", ('Charlie', 40))
 
 # Save (commit) the changes
