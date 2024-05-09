@@ -1,7 +1,7 @@
 import cv2, os, re
 import db
 
-def chup_anh(name, code, , n = 20):
+def chup_anh(name, code, n = 20):
     if not os.path.exists("images"):
         os.mkdir("images")
     stt = 1
