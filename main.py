@@ -15,6 +15,7 @@ def chupanh(name, code):
         else:
             file_path = f'images/{name}.{code}.{stt}.jpg'
             cv2.imwrite(file_path, frame)
+            print(f"Đã lưu ảnh {file_path}")
             stt += 1
         cv2.waitKey(1)
 
@@ -59,26 +60,34 @@ db.open()
 db.create_table_SV()
 
 if __name__=="__main__":
-    print("Chon Chuc Nang")
-    key = input(">>")
-    if key == "1":
-        while True:
-            Nhap_Thong_Tin()
-            print("Bạn có muốn Nhập Tiếp Không? (Y/N)")
-            key = input(">>")
-            if key == "y" or key =="Y":
-                continue
-            else: 
-                break
-    elif key == "2":
-        while True:
-            mssv = input("mssv cần xóa : ")
-            Xoa_Thong_Tin(mssv)
-            print("Bạn có muốn Xóa Tiếp Không? (Y/N)")
-            key = input(">>")
-            if key == "y" or key =="Y":
-                continue
-            else: 
-                break
+    while True:
+        print("Chon Chuc Nang")
+        print("1. Nhập Thông Tin Sinh Viên")
+        print("2. Xóa Thông Tin Sinh Viên")
+        print("0. Thoát")
+        key = input(">>")
+        if key == "1":
+            while True:
+                Nhap_Thong_Tin()
+                print("Bạn có muốn Nhập Tiếp Không? (Y/N)")
+                key = input(">>")
+                if key == "y" or key =="Y":
+                    continue
+                else: 
+                    break
+        elif key == "2":
+            while True:
+                mssv = input("mssv cần xóa : ")
+                Xoa_Thong_Tin(mssv)
+                print("Bạn có muốn Xóa Tiếp Không? (Y/N)")
+                key = input(">>")
+                if key == "y" or key =="Y":
+                    continue
+                else: 
+                    break
+        elif key == "0":
+            break
+        else:
+            print("Lựa chọn sai. vui lhong chon lại")
     db.save()
     db.close()
