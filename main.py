@@ -54,12 +54,12 @@ db.open()
 
 if __name__=="__main__":
     while True:
-        print("================================================")
+        print("=================================================")        
         print("1. Nhập Thông Tin Sinh Viên")
         print("2. Xóa Thông Tin Sinh Viên")
         print("0. Thoát")
         chon = input("Chọn thao tác muốn thực hiện: ")
-        print("================================================")
+        print("=================================================")
         if chon == "1":
             print("Đang mở camera")
             camera = cv2.VideoCapture(0)
