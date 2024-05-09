@@ -2,8 +2,8 @@ import cv2
 import os
 
 def chupanh(name, code):
-    if not os.path.exists("image"):
-        os.mkdir("image")
+    if not os.path.exists("images"):
+        os.mkdir("images")
 
     camera = cv2.VideoCapture(0)
     stt = 1
