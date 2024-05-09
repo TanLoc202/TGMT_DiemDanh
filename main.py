@@ -1,9 +1,10 @@
 import cv2
 import os
+import db
 
 def chupanh(name, code):
-    if not os.path.exists("image"):
-        os.mkdir("image")
+    if not os.path.exists("images"):
+        os.mkdir("images")
 
     camera = cv2.VideoCapture(0)
     stt = 1
@@ -20,4 +21,12 @@ def chupanh(name, code):
         cv2.waitKey(1)
 
 if __name__=="__main__":
-    chupanh("Loc", "110120142")
+    id = 0
+    while id != -1:
+        id = input("Mssv: ")
+        tensv = input("Ten SV: ")
+        namsinh = input("Nam Sinh: ")
+        
+        # Tách tên từ chuỗi họ và tên
+        tach = tensv.split()
+        chupanh(tach[-1], id)
