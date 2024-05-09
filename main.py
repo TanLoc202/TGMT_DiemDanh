@@ -2,6 +2,9 @@ import cv2
 import os
 import db
 
+db.open()
+db.create_table_SV()
+
 def chupanh(name, code):
     if not os.path.exists("images"):
         os.mkdir("images")
@@ -26,7 +29,7 @@ if __name__=="__main__":
         id = input("Mssv: ")
         tensv = input("Ten SV: ")
         namsinh = input("Nam Sinh: ")
-        
+        db.insert_SV(id, tensv, namsinh)
         # Tách tên từ chuỗi họ và tên
         tach = tensv.split()
         chupanh(tach[-1], id)

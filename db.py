@@ -1,9 +1,11 @@
 import sqlite3
 
-# Kết nối đến cơ sở dữ liệu (nếu không tồn tại, sẽ tự động tạo mới)
-conn = sqlite3.connect('dbsinhvien.db')
+def open(name = 'dbsinhvien.db'):
+    global conn
+    # Kết nối đến cơ sở dữ liệu (nếu không tồn tại, sẽ tự động tạo mới)
+    conn = sqlite3.connect('dbsinhvien.db')
 
-def create_table():
+def create_table_SV():
     # Tạo con trỏ
     c = conn.cursor()
 
@@ -19,8 +21,12 @@ def create_table():
 
 def insert_SV(mssv, tensv, namsinh):
     cur = conn.cursor()
-    cur.execute("INSERT INTO sinhvien (Mssv, TenSV, NamSinh) VALUES (?, ?, ?, ?, ?, ?)", (mssv, tensv, namsinh))
-    
-# Lưu thay đổi và đóng kết nối
-conn.commit()
-conn.close()
+    ret = cur.execute("INSERT INTO sinhvien (Mssv, TenSV, NamSinh) VALUES (?, ?, ?)", (mssv, tensv, namsinh))
+    print(ret)
+
+def save():
+    # Lưu thay đổi và đóng kết nối
+    conn.commit()
+
+def close():
+    conn.close()
