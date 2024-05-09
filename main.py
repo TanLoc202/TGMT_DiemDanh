@@ -1,13 +1,11 @@
 import cv2, os, re
 import db
 
-camera = cv2.VideoCapture(0)
-def chupanh(name, code):
+def chup_anh(name, code, , n = 20):
     if not os.path.exists("images"):
         os.mkdir("images")
-
     stt = 1
-    while camera.isOpened() and stt <21:
+    while camera.isOpened() and stt <= n:
         ret, frame = camera.read()
         if not ret:
             print("Không thể đọc frame từ webcam.")
@@ -19,73 +17,67 @@ def chupanh(name, code):
             stt += 1
         cv2.waitKey(1)
 
-def Nhap_Thong_Tin():
-    print("====================================================================")
-    mssv = input("Mssv: ")    
-    # Kiểm tra xem id đã tồn tại trong cơ sở dữ liệu hay chưa
-    if db.check_id_exist(mssv):
-        print("Sinh Vien Đã Tồn Tại.")
-        return      
-    tensv = input("Ten SV: ")
-    namsinh = input("Nam Sinh: ")
-        
-    #chen vao csdl
-    if db.insert_SV(mssv, tensv, namsinh):
-        print("Đang chụp ảnh")
-        ten = tensv.split()[-1]
-        chupanh(ten, mssv)
-        print("Đã chụp ảnh")
-
-def find_and_delete_images(directory, key):
+def xoa_anh(directory, key):
     pattern = re.compile(f".*{key}.*\.(jpg|jpeg|png|gif|bmp)", re.IGNORECASE)
     
-    for root, dirs, files in os.walk(directory):
+    for root, _, files in os.walk(directory):
         for file in files:
             if pattern.match(file):
                 file_path = os.path.join(root, file)
                 try:
                     os.remove(file_path)  # Xóa file
-                    print(f"Đã xóa: {file_path}")
+                    print(f"Đã xóa file: {file_path}")
                 except OSError as e:
-                    print(f"Lỗi: {file_path} - {e}")
+                    print(f"Lỗi xóa file: {file_path} - {e}")
     
+def nhap_thong_tin():
+    print("================================================")
+    mssv = input("MSSV: ")    
+    # Kiểm tra xem id đã tồn tại trong cơ sở dữ liệu hay chưa
+    if db.check_id_exist(mssv):
+        print("Sinh Vien Đã Tồn Tại.")
+        return      
+    tensv = input("Họ Tên: ")
+    namsinh = input("Năm Sinh: ")
+        
+    #chen vao csdl
+    if db.insert_SV(mssv, tensv, namsinh):
+        print("- Chụp Ảnh -")
+        ten = tensv.split()[-1]
+        chup_anh(ten, mssv)
 
-def Xoa_Thong_Tin(mssv):
-    if db.delete_SV(mssv):
-        find_and_delete_images("images", mssv)
-    else:
-        pass
+def xoa_thong_tin(mssv):
+    db.delete_SV(mssv)
+    print("- Xóa Ảnh -")
+    xoa_anh("images", mssv) 
 
 db.open()
-db.create_table_SV()
 
 if __name__=="__main__":
     while True:
-        print("Chon Chuc Nang")
         print("1. Nhập Thông Tin Sinh Viên")
         print("2. Xóa Thông Tin Sinh Viên")
         print("0. Thoát")
-        key = input(">>")
-        if key == "1":
+        chon = input("Chọn thao tác muốn thực hiện: ")
+        if chon == "1":
+            camera = cv2.VideoCapture(0)
+            k = 'y'
             while True:
-                Nhap_Thong_Tin()
-                print("Bạn có muốn Nhập Tiếp Không? (Y/N)")
-                key = input(">>")
-                if key == "y" or key =="Y":
-                    continue
-                else: 
+                if k.upper() == "Y":
+                    nhap_thong_tin()
+                elif k.upper() == "N":
                     break
-        elif key == "2":
+                k = input("Bạn có muốn nhập tiếp không? (Y/N): ")
+        elif chon == "2":
+            k = "y"
             while True:
-                mssv = input("mssv cần xóa : ")
-                Xoa_Thong_Tin(mssv)
-                print("Bạn có muốn Xóa Tiếp Không? (Y/N)")
-                key = input(">>")
-                if key == "y" or key =="Y":
-                    continue
-                else: 
+                if k.upper() == "Y":
+                    mssv = input("mssv cần xóa : ")
+                    xoa_thong_tin()
+                elif k.upper() == "N":
                     break
-        elif key == "0":
+                k = input("Bạn có muốn xóa tiếp không? (Y/N): ")
+        elif chon == "0":
             break
         else:
             print("Lựa chọn sai. vui lhong chon lại")

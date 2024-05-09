@@ -1,10 +1,10 @@
 import sqlite3
 
 conn = None
-
 def open(name='dbsinhvien.db'):
     global conn
     conn = sqlite3.connect(name)
+    create_table_SV() # tạo bảng nếu không tồn tại 
 
 def create_table_SV():
     try:
@@ -18,7 +18,7 @@ def create_table_SV():
                                 SoLanTruyCap INTEGER DEFAULT 0
                             )''')
     except sqlite3.Error as e:
-        print("Lỗi khi tạo bảng:", e)
+        print("SQLite - Lỗi khi tạo bảng:", e)
 
 def insert_SV(mssv, tensv, namsinh):
     try:
@@ -26,25 +26,18 @@ def insert_SV(mssv, tensv, namsinh):
             conn.execute("INSERT INTO sinhvien (Mssv, TenSV, NamSinh) VALUES (?, ?, ?)", (mssv, tensv, namsinh))
             return True
     except sqlite3.Error as e:
-        print("Lỗi khi chèn dữ liệu:", e)
+        print("SQLite - Lỗi khi chèn dữ liệu:", e)
         return False
 
 def check_id_exist(mssv):
     cur = conn.cursor()
     cur.execute("SELECT COUNT(*) FROM sinhvien WHERE Mssv = ?", (mssv,))
-    count = cur.fetchone()[0]
-    return count > 0
+    return cur.fetchone()[0] > 0
 
 def delete_SV(mssv):
     cur = conn.cursor()
     cur.execute("DELETE FROM sinhvien WHERE Mssv = ?", (mssv,))
-    if cur.rowcount > 0:
-        print("Xóa Thành Công")
-        return True
-    else:
-        print("Không Có Dòng Nào Để Xóa")
-        return False
-
+    return cur.rowcount > 0
 
 def save():
     try:
