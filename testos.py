@@ -1,6 +1,8 @@
-import os
+import os, re
 def find_images_with_number(directory, number):
     image_files = []
+    pattern = re.compile(f".*{number}.*\.(jpg|jpeg|png|gif|bmp)", re.IGNORECASE)
+    
     for root, dirs, files in os.walk(directory):
         for file in files:
             if pattern.match(file):

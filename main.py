@@ -35,20 +35,23 @@ def Nhap_Thong_Tin():
         chupanh(ten, mssv)
         print("Đã chụp ảnh")
 
-def find_images_with_key(directory, key):
-    image_files = []
-    pattern = re.compile(f".*.{key}.*\.(jpg|jpeg|png|gif|bmp)", re.IGNORECASE)
+def find_and_delete_images(directory, key):
+    pattern = re.compile(f".*{key}.*\.(jpg|jpeg|png|gif|bmp)", re.IGNORECASE)
     
     for root, dirs, files in os.walk(directory):
         for file in files:
             if pattern.match(file):
-                image_files.append(os.path.join(root, file))
+                file_path = os.path.join(root, file)
+                try:
+                    os.remove(file_path)  # Xóa file
+                    print(f"Đã xóa: {file_path}")
+                except OSError as e:
+                    print(f"Lỗi: {file_path} - {e}")
     
-    return image_files
 
 def Xoa_Thong_Tin(mssv):
     if db.delete_SV(mssv):
-        pass
+        find_and_delete_images("images", mssv)
     else:
         pass
 
@@ -56,13 +59,26 @@ db.open()
 db.create_table_SV()
 
 if __name__=="__main__":
-    while True:
-        Nhap_Thong_Tin()
-        print("Bạn có muốn Nhập Tiếp Không? (Y/N)")
-        key = input(">>")
-        if key == "y" or key =="Y":
-            continue
-        else: 
-            break
+    print("Chon Chuc Nang")
+    key = input(">>")
+    if key == "1":
+        while True:
+            Nhap_Thong_Tin()
+            print("Bạn có muốn Nhập Tiếp Không? (Y/N)")
+            key = input(">>")
+            if key == "y" or key =="Y":
+                continue
+            else: 
+                break
+    elif key == "2":
+        while True:
+            mssv = input("mssv cần xóa : ")
+            Xoa_Thong_Tin(mssv)
+            print("Bạn có muốn Xóa Tiếp Không? (Y/N)")
+            key = input(">>")
+            if key == "y" or key =="Y":
+                continue
+            else: 
+                break
     db.save()
     db.close()
