@@ -35,6 +35,17 @@ def check_id_exist(mssv):
     count = cur.fetchone()[0]
     return count > 0
 
+def delete_SV(mssv):
+    cur = conn.cursor()
+    cur.execute("DELETE FROM sinhvien WHERE Mssv = ?", (mssv))
+    if cur.rowcount > 0:
+        print("Xóa Thành Công")
+        return True
+    else:
+        print("Không Có Dòng Nào Để Xóa")
+        return False
+
+
 def save():
     try:
         conn.commit()
