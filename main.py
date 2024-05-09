@@ -1,7 +1,5 @@
-import cv2
-import os
+import cv2, os
 import db
-
 
 def chupanh(name, code):
     if not os.path.exists("images"):
