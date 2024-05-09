@@ -24,12 +24,18 @@ def chupanh(name, code):
         cv2.waitKey(1)
 
 if __name__=="__main__":
-    id = 0
-    while id != -1:
+    while True:
         id = input("Mssv: ")
+        
+        # Kiểm tra xem id đã tồn tại trong cơ sở dữ liệu hay chưa
+        if db.check_id_exist(id):
+            print("Trùng mã số sinh viên. Vui lòng nhập lại.")
+            continue
+        
         tensv = input("Ten SV: ")
         namsinh = input("Nam Sinh: ")
         db.insert_SV(id, tensv, namsinh)
+        
         # Tách tên từ chuỗi họ và tên
         tach = tensv.split()
         chupanh(tach[-1], id)

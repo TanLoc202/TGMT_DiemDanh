@@ -1,32 +1,43 @@
 import sqlite3
 
-def open(name = 'dbsinhvien.db'):
+conn = None
+
+def open(name='dbsinhvien.db'):
     global conn
-    # Kết nối đến cơ sở dữ liệu (nếu không tồn tại, sẽ tự động tạo mới)
-    conn = sqlite3.connect('dbsinhvien.db')
+    conn = sqlite3.connect(name)
 
 def create_table_SV():
-    # Tạo con trỏ
-    c = conn.cursor()
-
-    # Tạo bảng dbsinhvien
-    c.execute('''CREATE TABLE IF NOT EXISTS sinhvien (
-                    Mssv INTEGER PRIMARY KEY,
-                    TenSV TEXT NOT NULL,
-                    NamSinh INTEGER,
-                    NgayTao TEXT DEFAULT CURRENT_TIMESTAMP,
-                    NgayCapNhat TEXT DEFAULT CURRENT_TIMESTAMP,
-                    SoLanTruyCap INTEGER DEFAULT 0
-                )''')
+    try:
+        with conn:
+            conn.execute('''CREATE TABLE IF NOT EXISTS sinhvien (
+                                Mssv INTEGER PRIMARY KEY,
+                                TenSV TEXT NOT NULL,
+                                NamSinh INTEGER,
+                                NgayTao TEXT DEFAULT CURRENT_TIMESTAMP,
+                                NgayCapNhat TEXT DEFAULT CURRENT_TIMESTAMP,
+                                SoLanTruyCap INTEGER DEFAULT 0
+                            )''')
+    except sqlite3.Error as e:
+        print("Lỗi khi tạo bảng:", e)
 
 def insert_SV(mssv, tensv, namsinh):
+    try:
+        with conn:
+            conn.execute("INSERT INTO sinhvien (Mssv, TenSV, NamSinh) VALUES (?, ?, ?)", (mssv, tensv, namsinh))
+    except sqlite3.Error as e:
+        print("Lỗi khi chèn dữ liệu:", e)
+
+def check_id_exist(mssv):
     cur = conn.cursor()
-    ret = cur.execute("INSERT INTO sinhvien (Mssv, TenSV, NamSinh) VALUES (?, ?, ?)", (mssv, tensv, namsinh))
-    print(ret)
+    cur.execute("SELECT COUNT(*) FROM sinhvien WHERE Mssv = ?", (mssv,))
+    count = cur.fetchone()[0]
+    return count > 0
 
 def save():
-    # Lưu thay đổi và đóng kết nối
-    conn.commit()
+    try:
+        conn.commit()
+    except sqlite3.Error as e:
+        print("Lỗi khi lưu thay đổi:", e)
 
 def close():
     conn.close()
