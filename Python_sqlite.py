@@ -1,3 +1,4 @@
+# Không Có liên Quan
 import sqlite3
 
 # Connect to the SQLite database (it will be created if it doesn't exist)
