@@ -60,6 +60,7 @@ if __name__=="__main__":
         print("0. Thoát")
         chon = input("Chọn thao tác muốn thực hiện: ")
         if chon == "1":
+            print("Đang mở camera")
             camera = cv2.VideoCapture(0)
             k = 'y'
             while True:
@@ -73,7 +74,7 @@ if __name__=="__main__":
             while True:
                 if k.upper() == "Y":
                     mssv = input("mssv cần xóa : ")
-                    xoa_thong_tin()
+                    xoa_thong_tin(mssv)
                 elif k.upper() == "N":
                     break
                 k = input("Bạn có muốn xóa tiếp không? (Y/N): ")
