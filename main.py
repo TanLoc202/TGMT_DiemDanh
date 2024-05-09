@@ -1,11 +1,11 @@
 import cv2, os, re
 import db
 
+camera = cv2.VideoCapture(0)
 def chupanh(name, code):
     if not os.path.exists("images"):
         os.mkdir("images")
 
-    camera = cv2.VideoCapture(0)
     stt = 1
     while camera.isOpened() and stt <21:
         ret, frame = camera.read()
