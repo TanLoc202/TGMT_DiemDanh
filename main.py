@@ -39,3 +39,5 @@ if __name__=="__main__":
         # Tách tên từ chuỗi họ và tên
         tach = tensv.split()
         chupanh(tach[-1], id)
+    db.save()
+    db.close()
