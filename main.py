@@ -2,8 +2,6 @@ import cv2
 import os
 import db
 
-db.open()
-db.create_table_SV()
 
 def chupanh(name, code):
     if not os.path.exists("images"):
@@ -19,25 +17,31 @@ def chupanh(name, code):
         else:
             file_path = f'images/{name}.{code}.{stt}.jpg'
             cv2.imwrite(file_path, frame)
-            print(file_path)
             stt += 1
         cv2.waitKey(1)
 
+def Nhap_Thong_Tin():
+    print("====================================================================")
+    mssv = input("Mssv: ")    
+    # Kiểm tra xem id đã tồn tại trong cơ sở dữ liệu hay chưa
+    if db.check_id_exist(mssv):
+        print("Sinh Vien Đã Tồn Tại.")
+        return      
+    tensv = input("Ten SV: ")
+    namsinh = input("Nam Sinh: ")
+        
+    #chen vao csdl
+    if db.insert_SV(mssv, tensv, namsinh):
+        print("Đang chụp ảnh")
+        ten = tensv.split()[-1]
+        chupanh(ten, mssv)
+        print("Đã chụp ảnh")
+
+db.open()
+db.create_table_SV()
+
 if __name__=="__main__":
     while True:
-        id = input("Mssv: ")
-        
-        # Kiểm tra xem id đã tồn tại trong cơ sở dữ liệu hay chưa
-        if db.check_id_exist(id):
-            print("Trùng mã số sinh viên. Vui lòng nhập lại.")
-            continue
-        
-        tensv = input("Ten SV: ")
-        namsinh = input("Nam Sinh: ")
-        db.insert_SV(id, tensv, namsinh)
-        
-        # Tách tên từ chuỗi họ và tên
-        tach = tensv.split()
-        chupanh(tach[-1], id)
+        Nhap_Thong_Tin()
     db.save()
     db.close()

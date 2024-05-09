@@ -24,8 +24,10 @@ def insert_SV(mssv, tensv, namsinh):
     try:
         with conn:
             conn.execute("INSERT INTO sinhvien (Mssv, TenSV, NamSinh) VALUES (?, ?, ?)", (mssv, tensv, namsinh))
+            return True
     except sqlite3.Error as e:
         print("Lỗi khi chèn dữ liệu:", e)
+        return False
 
 def check_id_exist(mssv):
     cur = conn.cursor()
