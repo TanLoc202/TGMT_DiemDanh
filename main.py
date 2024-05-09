@@ -31,7 +31,6 @@ def xoa_anh(directory, key):
                     print(f"Lỗi xóa file: {file_path} - {e}")
     
 def nhap_thong_tin():
-    print("================================================")
     mssv = input("MSSV: ")    
     # Kiểm tra xem id đã tồn tại trong cơ sở dữ liệu hay chưa
     if db.check_id_exist(mssv):
@@ -55,15 +54,18 @@ db.open()
 
 if __name__=="__main__":
     while True:
+        print("================================================")
         print("1. Nhập Thông Tin Sinh Viên")
         print("2. Xóa Thông Tin Sinh Viên")
         print("0. Thoát")
         chon = input("Chọn thao tác muốn thực hiện: ")
+        print("================================================")
         if chon == "1":
             print("Đang mở camera")
             camera = cv2.VideoCapture(0)
             k = 'y'
             while True:
+                print("-------------------------------------------------")
                 if k.upper() == "Y":
                     nhap_thong_tin()
                 elif k.upper() == "N":
@@ -72,6 +74,7 @@ if __name__=="__main__":
         elif chon == "2":
             k = "y"
             while True:
+                print("-------------------------------------------------")
                 if k.upper() == "Y":
                     mssv = input("mssv cần xóa : ")
                     xoa_thong_tin(mssv)
