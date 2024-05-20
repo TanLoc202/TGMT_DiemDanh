@@ -22,6 +22,20 @@ def tao_bang_sinhvien():
     except sqlite3.Error as e:
         print("SQLite - Lỗi khi tạo bảng sinhvien", e)
 
+def tao_bang_check_in():
+    try:
+        with conn:
+            conn.execute('''CREATE TABLE IF NOT EXISTS check_in (
+                                MSSV INTEGER,
+                                Ngay TEXT PRIMARY KEY,
+                                Buoi TEXT,
+                                FOREIGN KEY (MSSV) REFERENCES sinhvien (Mssv)
+                            )''')
+    except sqlite3.Error as e:
+        print("SQLite - Lỗi khi tạo bảng check_in", e)
+
+
+
 def them_sinhvien(mssv, tensv, namsinh):
     if not kiem_tra_sinhvien(mssv):
         try:
