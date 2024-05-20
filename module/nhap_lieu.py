@@ -30,7 +30,6 @@ def chup_anh(camera, code, n = 100, directory = img_folder):
             # Vẽ hình chữ nhật xung quanh khuôn mặt
             cv2.rectangle(frame, (x, y), (x+w, y+h), (255, 0, 0), 2)
             cv2.imshow("Chup Anh", frame)
-            print(x, y, w, h)
             # Cắt vùng chứa khuôn mặt
             face = frame[y:y+h, x:x+w]
             

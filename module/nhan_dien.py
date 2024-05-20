@@ -2,6 +2,9 @@ import cv2
 from PIL import Image, ImageDraw, ImageFont
 import numpy as np
 import os
+from . import database as db
+from datetime import datetime
+from openpyxl import Workbook
 
 #--------
 model_path = "data/face_recognizer.yml"
@@ -55,9 +58,29 @@ def huan_luyen_model(data_path = img_folder, model_path = model_path):
 
     print(f"Mô hình đã được huấn luyện và lưu vào {model_path}.")
 
-def truy_cap():
-    cap = cv2.VideoCapture(0)
+def xuat_file_excel(excel_file='DiemDanh.xlsx'):
+    ngay = datetime.now().date()
+    rows = db.sinhvien_co_mat_ngay(ngay)
+    for row in rows:
+        print(f"{row[0]:<10} | {row[1]:<30} | {row[2]:<5} | {row[3]:<50}") 
 
+    # Khởi tạo một workbook
+    wb = Workbook()
+
+    # Tạo một worksheet mới
+    ws = wb.active
+
+    # Ghi dữ liệu từ list hai chiều vào worksheet
+    for row_index, row_data in enumerate(rows, start=1):
+        for col_index, cell_value in enumerate(row_data, start=1):
+            ws.cell(row=row_index, column=col_index, value=cell_value)
+
+    # Lưu workbook vào file Excel
+    wb.save(excel_file)
+
+def diem_danh():
+    cap = cv2.VideoCapture(0)
+    recognizer.read(model_path)
     while True:
         # Đọc frame từ camera
         ret, frame = cap.read()
@@ -73,19 +96,23 @@ def truy_cap():
         # Nhận diện từng khuôn mặt
         for (x, y, w, h) in faces:
             roi_gray = gray[y:y+h, x:x+w]
-            label, confidence = recognizer.predict(roi_gray)
+            id, confidence = recognizer.predict(roi_gray)
             
             if confidence < 70:
             # Vẽ khung và hiển thị nhãn
-                frame = put_vie_text(frame, f"ID: {label}", (x, y-10), (255, 0, 0))
+                db.truy_cap(id)
+                frame = put_vie_text(frame, f"ID: {id}", (x, y-10), (255, 0, 0))
                 cv2.rectangle(frame, (x, y), (x+w, y+h), (255, 0, 0), 2)
 
         # Hiển thị kết quả
         cv2.imshow('Kết quả nhận diện khuôn mặt', frame)
 
+        key = cv2.waitKey(1)
         # Thoát khi nhấn phím 'q'
-        if cv2.waitKey(1) & 0xFF == ord('q'):
+        if key == ord('q'):
             break
+        elif key == ord('p'):
+            xuat_file_excel()
 
     # Giải phóng camera và đóng tất cả cửa sổ
     cap.release()
