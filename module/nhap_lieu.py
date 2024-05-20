@@ -3,11 +3,12 @@ from . import ket_noi as db
 
 # Sử dụng bộ phát hiện khuôn mặt Haar Cascade
 face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
+img_folder = "data/images/"
+db_path = "data/sinhvien.db"
 
-
-def chup_anh(camera, code, n = 100, folder = "data/images/"):
-    if not os.path.exists(folder):
-        os.mkdir(folder)
+def chup_anh(camera, code, n = 100, directory = img_folder):
+    if not os.path.exists(directory):
+        os.mkdir(directory)
 
     face_count = 0
     while face_count < n:
@@ -33,24 +34,18 @@ def chup_anh(camera, code, n = 100, folder = "data/images/"):
             face = frame[y:y+h, x:x+w]
             
             # Lưu ảnh khuôn mặt
-            face_filename = f'{folder}{code}.{face_count}.jpg'
+            face_filename = f'{directory}{code}.{face_count}.jpg'
             cv2.imwrite(face_filename, face)
             
             face_count += 1
 
-def xoa_anh(directory, key):
-    pattern = re.compile(f".*{key}.*\.(jpg|jpeg|png|gif|bmp)", re.IGNORECASE)
-    
-    for root, _, files in os.walk(directory):
-        for file in files:
-            if pattern.match(file):
-                file_path = os.path.join(root, file)
-                try:
-                    os.remove(file_path)  # Xóa file
-                    print(f"Đã xóa file: {file_path}")
-                except OSError as e:
-                    print(f"Lỗi xóa file: {file_path} - {e}")
-    
+def xoa_anh(code, directory = img_folder):
+    for image_name in os.listdir(directory):
+        if image_name.split('.')[0] == code:
+            img_path = os.path.join(directory, image_name)
+            os.remove(img_path)  
+
+
 def nhap_thong_tin():
     mssv = input("MSSV: ")        
     tensv = input("Họ Tên: ")
@@ -58,21 +53,29 @@ def nhap_thong_tin():
         
     #chen vao csdl
     if db.them_sinhvien(mssv, tensv, namsinh):
-        print("- Chụp Ảnh -")
+        print("- Đang chụp Ảnh -")
         chup_anh(cap, mssv)
 
-def xoa_thong_tin(mssv):
+def xoa_thong_tin():
+    mssv = input("mssv cần xóa : ")
     db.xoa_sinhvien(mssv)
-    print("- Xóa Ảnh -")
-    xoa_anh("images", mssv) 
+    print("- Đang xóa Ảnh -")
+    xoa_anh(mssv) 
 
-db.mo_kn()
+def xem_thong_tin():
+    print(f"{'MSSV':<10} | {'Họ Tên':<30} | {'NSinh':<5} | {'Ngày tạo':<20} | {'Ngày Cập Nhật':<20} | {'Số lần truy cập':<10}")
+    rows = db.ds_sinhvien()
+    for row in rows:
+       print(f"{row[0]:<10} | {row[1]:<30} | {row[2]:<5} | {row[3]:<20} | {row[4]:<20} | {row[5]:<10}")
+
+db.mo_kn(db_path)
 
 def run():
     while True:
         print("=================================================")        
-        print("1. Nhập Thông Tin Sinh Viên")
-        print("2. Xóa Thông Tin Sinh Viên")
+        print("1. Nhập thông tin Sinh viên")
+        print("2. Xóa thông tin Sinh viên")
+        print("3. Xem danh sách Sinh viên")
         print("0. Thoát")
         chon = input("Chọn thao tác muốn thực hiện: ")
         print("=================================================")
@@ -93,11 +96,16 @@ def run():
             while True:
                 print("-------------------------------------------------")
                 if k.upper() == "Y":
-                    mssv = input("mssv cần xóa : ")
-                    xoa_thong_tin(mssv)
+                    xoa_thong_tin()
                 elif k.upper() == "N":
                     break
                 k = input("Bạn có muốn xóa tiếp không? (Y/N): ")
+        elif chon == "3":
+            print("-------------------------------------------------")
+            print("DANH SACH SINH VIEN")
+            xem_thong_tin()
+            print("-------------------------------------------------")
+            input("Nhấn enter để trở lại")
         elif chon == "0":
             break
         else:

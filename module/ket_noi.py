@@ -45,5 +45,13 @@ def xoa_sinhvien(mssv):
     cur.execute("DELETE FROM sinhvien WHERE Mssv = ?", (mssv,))
     return cur.rowcount > 0
 
+def ds_sinhvien(dieukien = ""):
+    cur = conn.cursor()
+    sql = "SELECT * FROM sinhvien"
+    if dieukien != "":
+        sql += f" where {dieukien}"
+    cur.execute(sql)
+    return cur.fetchall()
+
 def dong_kn():
     conn.close()
