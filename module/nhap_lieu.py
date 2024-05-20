@@ -1,10 +1,12 @@
 import cv2, os
 from . import database as db
+#----------
+img_folder = "data/images/"
+db_path = "data/sinhvien.db"
+#----------
 
 # Sử dụng bộ phát hiện khuôn mặt Haar Cascade
 face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
-img_folder = "data/images/"
-db_path = "data/sinhvien.db"
 
 def chup_anh(camera, code, n = 100, directory = img_folder):
     if not os.path.exists(directory):
