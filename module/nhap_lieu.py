@@ -29,7 +29,6 @@ def chup_anh(camera, code, n = 100, directory = img_folder):
         for (x, y, w, h) in faces:
             # Vẽ hình chữ nhật xung quanh khuôn mặt
             cv2.rectangle(frame, (x, y), (x+w, y+h), (255, 0, 0), 2)
-            cv2.imshow("Chup Anh", frame)
             # Cắt vùng chứa khuôn mặt
             face = frame[y:y+h, x:x+w]
             
@@ -67,8 +66,6 @@ def xem_thong_tin():
     rows = db.ds_sinhvien()
     for row in rows:
        print(f"{row[0]:<10} | {row[1]:<30} | {row[2]:<5} | {row[3]:<20} | {row[4]:<20} | {row[5]:<10}")
-
-db.mo_kn(db_path)
 
 def run():
     while True:

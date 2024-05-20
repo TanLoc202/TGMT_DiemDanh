@@ -6,6 +6,7 @@ from . import database as db
 from datetime import datetime
 from openpyxl import Workbook
 
+
 #--------
 model_path = "data/face_recognizer.yml"
 img_folder = "data/images/"
@@ -64,12 +65,11 @@ def xuat_file_excel(excel_file='DiemDanh.xlsx'):
     for row in rows:
         print(f"{row[0]:<10} | {row[1]:<30} | {row[2]:<5} | {row[3]:<50}") 
 
+    rows = [[f"DANH SACH DIEM DANH NGAY {ngay}"], ["MSSV", "Họ Tên", "Năm Sinh", "Diem Danh"]] + rows
     # Khởi tạo một workbook
     wb = Workbook()
-
     # Tạo một worksheet mới
     ws = wb.active
-
     # Ghi dữ liệu từ list hai chiều vào worksheet
     for row_index, row_data in enumerate(rows, start=1):
         for col_index, cell_value in enumerate(row_data, start=1):
@@ -98,7 +98,7 @@ def diem_danh():
             roi_gray = gray[y:y+h, x:x+w]
             id, confidence = recognizer.predict(roi_gray)
             
-            if confidence < 70:
+            if confidence < 50:
             # Vẽ khung và hiển thị nhãn
                 db.truy_cap(id)
                 frame = put_vie_text(frame, f"ID: {id}", (x, y-10), (255, 0, 0))

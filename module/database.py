@@ -101,3 +101,5 @@ def sinhvien_co_mat_ngay(ngay):
 
 def dong_kn():
     conn.close()
+
+mo_kn()
