@@ -2,7 +2,7 @@ import sqlite3
 
 conn = None
 
-def mo_kn(filedb='sinhvien.db'):
+def mo_kn(filedb='data/sinhvien.db'):
     global conn
     conn = sqlite3.connect(filedb)
     # tạo bảng nếu không tồn tại.
@@ -23,7 +23,7 @@ def tao_bang_sinhvien():
         print("SQLite - Lỗi khi tạo bảng sinhvien", e)
 
 def them_sinhvien(mssv, tensv, namsinh):
-    if kiem_tra_sinhvien(mssv):
+    if not kiem_tra_sinhvien(mssv):
         try:
             with conn:
                 conn.execute("INSERT INTO sinhvien (Mssv, TenSV, NamSinh) VALUES (?, ?, ?)", (mssv, tensv, namsinh))
