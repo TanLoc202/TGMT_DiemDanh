@@ -6,6 +6,7 @@
  **Huỳnh Tấn Lộc**<br>
  **Nguyễn Quốc Huy Khanh**<br>
 
+## Nội dung
 <table>
     <tr>
         <th>Buổi</th>
@@ -32,5 +33,3 @@
         <td>--</td>
     </tr>
 </table>
-
-link https://www.github.com/TanLoc202/TGMT_DiemDanh
