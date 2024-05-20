@@ -5,10 +5,9 @@ conn = None
 def mo_kn(filedb='data/sinhvien.db'):
     global conn
     conn = sqlite3.connect(filedb)
-    # tạo bảng nếu không tồn tại.
-    tao_bang_sinhvien()
 
-def tao_bang_sinhvien():
+
+def sinhvien():
     try:
         with conn:
             conn.execute('''CREATE TABLE IF NOT EXISTS sinhvien (
@@ -22,14 +21,14 @@ def tao_bang_sinhvien():
     except sqlite3.Error as e:
         print("SQLite - Lỗi khi tạo bảng sinhvien", e)
 
-def tao_bang_check_in():
+def check_in():
     try:
         with conn:
             conn.execute('''CREATE TABLE IF NOT EXISTS check_in (
-                                MSSV INTEGER,
-                                Ngay TEXT PRIMARY KEY,
-                                Buoi TEXT,
-                                FOREIGN KEY (MSSV) REFERENCES sinhvien (Mssv)
+                                Mssv INTEGER,
+                                Ngay TEXT,
+                                FOREIGN KEY (Mssv) REFERENCES sinhvien (Mssv),
+                                PRIMARY KEY (Mssv, Ngay)
                             )''')
     except sqlite3.Error as e:
         print("SQLite - Lỗi khi tạo bảng check_in", e)
@@ -66,6 +65,25 @@ def ds_sinhvien(dieukien = ""):
         sql += f" where {dieukien}"
     cur.execute(sql)
     return cur.fetchall()
+
+def kiem_tra_sinhvien(mssv):
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM sinhvien WHERE Mssv = ?", (mssv,))
+    return cur.fetchone()[0] > 0
+
+def truy_cap(mssv):
+    try:
+        with conn:
+            cursor = conn.execute("SELECT SoLanTruyCap FROM sinhvien WHERE Mssv = ?", (mssv,))
+            result = cursor.fetchone()
+            if result:
+                return result[0]  # Trả về số lần truy cập
+            else:
+                print("Không tìm thấy sinh viên với Mssv này.")
+                return None
+    except sqlite3.Error as e:
+        print("SQLite - Lỗi khi truy vấn số lần truy cập của sinh viên", e)
+        return None
 
 def dong_kn():
     conn.close()
