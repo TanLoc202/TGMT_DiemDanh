@@ -1,5 +1,5 @@
-import cv2, os, re
-from . import ket_noi as db
+import cv2, os
+from . import database as db
 
 # Sử dụng bộ phát hiện khuôn mặt Haar Cascade
 face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
@@ -22,14 +22,13 @@ def chup_anh(camera, code, n = 100, directory = img_folder):
         
         # Phát hiện khuôn mặt
         faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30), flags=cv2.CASCADE_SCALE_IMAGE)
-        
-        if len(faces) > 0:
-            # Lấy khuôn mặt đầu tiên được phát hiện
-            (x, y, w, h) = faces[0]
+        #cv2.rectangle(frame, (x, y), (x+w, y+h), (255, 0, 0), 2)
             
+        for (x, y, w, h) in faces:
             # Vẽ hình chữ nhật xung quanh khuôn mặt
             cv2.rectangle(frame, (x, y), (x+w, y+h), (255, 0, 0), 2)
-            
+            cv2.imshow("Chup Anh", frame)
+            print(x, y, w, h)
             # Cắt vùng chứa khuôn mặt
             face = frame[y:y+h, x:x+w]
             
@@ -81,8 +80,10 @@ def run():
         print("=================================================")
         if chon == "1":
             print("Đang mở camera")
+            
             global cap
             cap = cv2.VideoCapture(0)
+
             k = 'y'
             while True:
                 print("-------------------------------------------------")
