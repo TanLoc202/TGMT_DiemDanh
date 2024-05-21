@@ -1,3 +1,8 @@
+#--------
+model_path = "data/face_recognizer.yml"
+imgdir_path = "data/images/"
+#--------
+
 import cv2
 from PIL import Image, ImageDraw, ImageFont
 import numpy as np
@@ -6,81 +11,124 @@ from . import database as db
 from datetime import datetime
 from openpyxl import Workbook
 
-
-#--------
-model_path = "data/face_recognizer.yml"
-img_folder = "data/images/"
-db_path = "data/sinhvien.db"
-#--------
+import tkinter as tk
+from tkinter import simpledialog    
+root = tk.Tk()
+root.withdraw()  # Ẩn cửa sổ chính
 
 recognizer = cv2.face.LBPHFaceRecognizer_create()
 face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
 
-import cv2
-import numpy as np
-from PIL import Image, ImageDraw, ImageFont
+def nhap_khuon_mat(camera = 0, directory = imgdir_path):
+    if not os.path.exists(directory):
+        os.mkdir(directory)
+    
+    cap = cv2.VideoCapture(camera)
+    X, Y, W, H = 200, 100, 250, 250
+    count = 100
+    while True:
+        # Đọc frame từ camera
+        ret, frame = cap.read()
+        if not ret:
+            break
+
+        key = cv2.waitKey(1)
+        # Thoát khi nhấn phím 'q'
+        if key == ord('q'):
+            break
+        elif key == ord('p'):
+            mssv = simpledialog.askstring("Nhập MSSV", "Nhập mã số sinh viên")
+            count = 0
+
+        if count == 100:
+            frame = put_vie_text(frame, "Nhấn P để nhập khuôn mặt mới", (200, 100), (255, 255, 255), 20)
+            cv2.imshow('Nhap Khuon Mat', frame)
+            continue
+
+        # Chuyển frame sang ảnh xám
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+        # Phát hiện khuôn mặt
+        faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
+        text = "Đưa khuôn mặt vào đây"
+        color = (0, 0, 255)
+        # Nhận diện từng khuôn mặt
+        for (x, y, w, h) in faces:            
+            cv2.rectangle(frame, (x, y), (x+w, y+h), (255, 0, 0), 2)
+            if x > X and y > Y and x+w < X+W and y+h < Y+H:
+                if x < X+20 and y < Y+50 and x+w > X+W-20 and y+h > Y+H-50:
+                    text = "Giữ Cố Định"
+                    color = (0, 255, 0)
+                    cv2.imwrite(f"{directory}{mssv}.{count}.jpg", frame[Y:Y+H, X:X+W])
+                    count += 1
+                else: 
+                    text = "Gần thêm chút"
+
+        cv2.rectangle(frame, (X, Y-30), (X+W, Y), color, -1)
+        cv2.rectangle(frame, (X, Y), (X+W, Y+H), color, 2)
+        frame = put_vie_text(frame, text, (X+5, Y-25), (255, 255, 255), 20)
+
+        # Hiển thị kết quả
+        cv2.imshow('Nhap Khuon Mat', frame)
+
+
+
+    # Giải phóng camera và đóng tất cả cửa sổ
+    cap.release()
+    cv2.destroyAllWindows()
+
+def huan_luyen_model(data_path = imgdir_path, model_path = model_path):
+    if os.path.exists(data_path):
+        # Khởi tạo các danh sách để lưu trữ hình ảnh và nhãn
+        faces = []
+        labels = []
+
+        # Đọc dữ liệu và gắn nhãn
+        for image_name in os.listdir(data_path):
+            img_path = os.path.join(data_path, image_name)
+            faceImg = Image.open(img_path).convert('L')
+            faceNp = np.array(faceImg, 'uint8')
+            faces.append(faceNp)
+            labels.append(int(image_name.split('.')[0]))
+        
+        if labels != []:
+            # Chuyển đổi danh sách thành mảng NumPy
+            labels = np.array(labels)
+            print("Đang huấn luyện mô hình")
+            recognizer.train(faces, labels)
+            recognizer.save(model_path)
+            print(f"Mô hình đã được huấn luyện và lưu vào {model_path}.")
+        else:
+            print("Không tìm thấy dữ liệu để huấn luyện")
+    else:
+        print("Đường dẫn đến thư mực chứa dữ liệu huấn luyện không tồn tại")
 
 def put_vie_text(img, text, position, color, font_size = 30, font_path = "C:/Windows/Fonts/Arial.ttf",):
-    # Convert the OpenCV image to a PIL image
     img_pil = Image.fromarray(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
     draw = ImageDraw.Draw(img_pil)
-    
-    # Load the font and specify the font size
     font = ImageFont.truetype(font_path, font_size)
-    
-    # Draw the text on the PIL image
     draw.text(position, text, font=font, fill=color)
-    
-    # Convert the PIL image back to an OpenCV image
     img = cv2.cvtColor(np.array(img_pil), cv2.COLOR_RGB2BGR)
-    
     return img
 
-def huan_luyen_model(data_path = img_folder, model_path = model_path):
-    # Khởi tạo các danh sách để lưu trữ hình ảnh và nhãn
-    faces = []
-    labels = []
-
-    # Đọc dữ liệu và gắn nhãn
-    for image_name in os.listdir(data_path):
-        img_path = os.path.join(data_path, image_name)
-        faceImg = Image.open(img_path).convert('L')
-        faceNp = np.array(faceImg, 'uint8')
-        faces.append(faceNp)
-        labels.append(int(image_name.split('.')[0]))
-
-    # Chuyển đổi danh sách thành mảng NumPy
-    labels = np.array(labels)
-    print("Đang huấn luyện mô hình")
-    # Huấn luyện mô hình
-    recognizer.train(faces, labels)
-    # Lưu mô hình đã huấn luyện
-    recognizer.save(model_path)
-
-    print(f"Mô hình đã được huấn luyện và lưu vào {model_path}.")
-
-def xuat_file_excel(excel_file='DiemDanh.xlsx'):
-    ngay = datetime.now().date()
-    rows = db.sinhvien_co_mat_ngay(ngay)
-    for row in rows:
-        print(f"{row[0]:<10} | {row[1]:<30} | {row[2]:<5} | {row[3]:<50}") 
-
+def xuat_file_diemdanh_ngay(ngay, file_path=""):
+    rows = db.diemdanh_ngay(ngay)
     rows = [[f"DANH SACH DIEM DANH NGAY {ngay}"], ["MSSV", "Họ Tên", "Năm Sinh", "Diem Danh"]] + rows
-    # Khởi tạo một workbook
+    # Khởi tạo một workbook và Tạo một worksheet mới
     wb = Workbook()
-    # Tạo một worksheet mới
     ws = wb.active
-    # Ghi dữ liệu từ list hai chiều vào worksheet
+    
     for row_index, row_data in enumerate(rows, start=1):
         for col_index, cell_value in enumerate(row_data, start=1):
             ws.cell(row=row_index, column=col_index, value=cell_value)
-
     # Lưu workbook vào file Excel
-    wb.save(excel_file)
+    if file_path == "":
+        file_path = f"diemdanh_{ngay}.xlsx"
+    wb.save(file_path)
 
-def diem_danh():
-    cap = cv2.VideoCapture(0)
+def run(camera = 0):
     recognizer.read(model_path)
+    cap = cv2.VideoCapture(camera)
     while True:
         # Đọc frame từ camera
         ret, frame = cap.read()
@@ -94,28 +142,30 @@ def diem_danh():
         faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
 
         # Nhận diện từng khuôn mặt
-        for (x, y, w, h) in faces:
+        for (x, y, w, h) in faces:            
+            cv2.rectangle(frame, (x, y), (x+w, y+h), (255, 0, 0), 2)
+            
+            cv2.rectangle(frame, (x, y-20), (x+w, y), (255, 0, 0), -1)
             roi_gray = gray[y:y+h, x:x+w]
             id, confidence = recognizer.predict(roi_gray)
-            
             if confidence < 50:
             # Vẽ khung và hiển thị nhãn
                 db.truy_cap(id)
-                frame = put_vie_text(frame, f"ID: {id}", (x, y-10), (255, 0, 0))
-                cv2.rectangle(frame, (x, y), (x+w, y+h), (255, 0, 0), 2)
+                frame = put_vie_text(frame, f"ID: {id}", (x, y-10), (255, 255, 255))
+            else: 
+                frame = put_vie_text(frame, f"Không Xác Định", (x, y-10), (255, 255, 255))
 
         # Hiển thị kết quả
-        cv2.imshow('Kết quả nhận diện khuôn mặt', frame)
+        cv2.imshow('Nhan Dien Khuon Mat', frame)
 
         key = cv2.waitKey(1)
         # Thoát khi nhấn phím 'q'
         if key == ord('q'):
             break
         elif key == ord('p'):
-            xuat_file_excel()
+            xuat_file_diemdanh_ngay(datetime.now().date())
 
     # Giải phóng camera và đóng tất cả cửa sổ
     cap.release()
     cv2.destroyAllWindows()
-
-
+    db.dong_kn()

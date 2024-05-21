@@ -7,7 +7,7 @@ def mo_kn(filedb='data/sinhvien.db'):
     global conn
     conn = sqlite3.connect(filedb)
     tao_bang_sinhvien()
-    tao_bang_check_in()
+    tao_bang_diemdanh()
 
 def tao_bang_sinhvien():
     try:
@@ -23,10 +23,10 @@ def tao_bang_sinhvien():
     except sqlite3.Error as e:
         print("SQLite - Lỗi khi tạo bảng sinhvien", e)
 
-def tao_bang_check_in():
+def tao_bang_diemdanh():
     try:
         with conn:
-            conn.execute('''CREATE TABLE IF NOT EXISTS check_in (
+            conn.execute('''CREATE TABLE IF NOT EXISTS diemdanh (
                                 Mssv INTEGER,
                                 Ngay TEXT,
                                 FOREIGN KEY (Mssv) REFERENCES sinhvien (Mssv),
@@ -55,6 +55,7 @@ def them_sinhvien(mssv, tensv, namsinh):
 
 def xoa_sinhvien(mssv):
     cur = conn.cursor()
+    cur.execute("DELETE FROM diemdanh WHERE Mssv = ?", (mssv,))
     cur.execute("DELETE FROM sinhvien WHERE Mssv = ?", (mssv,))
     return cur.rowcount > 0
 
@@ -68,7 +69,7 @@ def ds_sinhvien(dieukien = ""):
 
 def kiem_tra_truy_cap(mssv, ngay):
     cur = conn.cursor()
-    cur.execute("SELECT COUNT(*) FROM check_in WHERE Mssv = ? and Ngay = ?", (mssv, ngay))
+    cur.execute("SELECT COUNT(*) FROM diemdanh WHERE Mssv = ? and Ngay = ?", (mssv, ngay))
     return cur.fetchone()[0] > 0
 
 def truy_cap(mssv):
@@ -76,14 +77,14 @@ def truy_cap(mssv):
     if not kiem_tra_truy_cap(mssv, current_date):
         try:
             with conn:
-                conn.execute("INSERT INTO check_in (Mssv, Ngay) VALUES (?, ?)", (mssv, current_date))
+                conn.execute("INSERT INTO diemdanh (Mssv, Ngay) VALUES (?, ?)", (mssv, current_date))
                 conn.execute("UPDATE sinhvien SET SoLanTruyCap = SoLanTruyCap + 1, NgayCapNhat = CURRENT_TIMESTAMP WHERE Mssv = ?", (mssv,))
                 return True
         except sqlite3.Error as e:
             print("SQLite - Lỗi khi chèn dữ liệu:", e)
             return False
 
-def sinhvien_co_mat_ngay(ngay):
+def diemdanh_ngay(ngay):
     cur = conn.cursor()
     sql = """SELECT 
     sinhvien.Mssv, 
