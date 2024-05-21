@@ -20,6 +20,20 @@ def nhap_thong_tin():
     if db.them_sinhvien(mssv, tensv, namsinh):
         print("Thêm Thành Công")
 
+def nhap_sinhvien_tu_csv():
+    file_path = input("CSV_path: ")
+    # Đọc file CSV vào DataFrame
+    df = pd.read_csv(file_path)
+
+    # Lặp qua từng dòng và thực hiện hàm db.them_sinhvien(Mssv, TenSV, NamSinh)
+    for index, row in df.iterrows():
+        Mssv = row['Mssv']
+        TenSV = row['TenSV']
+        NamSinh = row['NamSinh']
+    
+        db.them_sinhvien(Mssv, TenSV, NamSinh)
+        print(f"Thêm sinh viên: Mã SV = {Mssv}, Tên SV = {TenSV}, Năm sinh = {NamSinh}")
+        
 def xoa_thong_tin():
     mssv = input("mssv cần xóa : ")
     db.xoa_sinhvien(mssv)
@@ -36,6 +50,7 @@ def run():
         os.system("cls")
         print("=================================================")        
         print("1. Nhập thông tin sinh viên")
+        print("2. Nhập sinh viên từ file csv")
         print("2. Xóa thông tin sinh viên")
         print("3. Xem danh sách sinh viên")
         print("0. Thoát")
@@ -51,6 +66,8 @@ def run():
                     break
                 k = input("Bạn có muốn nhập tiếp không? (Y/N): ")
         elif chon == "2":
+            nhap_sinhvien_tu_csv()
+        elif chon == "3":
             k = "y"
             while True:
                 print("-------------------------------------------------")
@@ -59,7 +76,7 @@ def run():
                 elif k.upper() == "N":
                     break
                 k = input("Bạn có muốn xóa tiếp không? (Y/N): ")
-        elif chon == "3":
+        elif chon == "4":
             print("-------------------------------------------------")
             print("DANH SACH SINH VIEN")
             xem_thong_tin()
