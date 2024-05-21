@@ -1,3 +1,6 @@
-from module import nhan_dien
+from module import database as db
 
-nhan_dien.nhap_khuon_mat(1)
+db.conn.execute("""UPDATE sinhvien
+SET NgayTao = '2024-05-20 05:31:14'
+""")
+db.dong_kn()
