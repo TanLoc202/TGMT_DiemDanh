@@ -54,13 +54,14 @@ def nhap_khuon_mat(camera = 0, directory = imgdir_path):
         color = (0, 0, 255)
         # Nhận diện từng khuôn mặt
         for (x, y, w, h) in faces:            
-            cv2.rectangle(frame, (x, y), (x+w, y+h), (255, 0, 0), 2)
             if x > X and y > Y and x+w < X+W and y+h < Y+H:
-                if x < X+20 and y < Y+50 and x+w > X+W-20 and y+h > Y+H-50:
+                if x < X+40 and y < Y+40 and x+w > X+W-40 and y+h > Y+H-40:
                     text = "Giữ Cố Định"
-                    color = (0, 255, 0)
+                    color = (20, 200, 20)
                     cv2.imwrite(f"{directory}{mssv}.{count}.jpg", frame[Y:Y+H, X:X+W])
                     count += 1
+                    cv2.rectangle(frame, (X, Y+H), (X+W, Y+H+30), color, -1)
+                    frame = put_vie_text(frame, f"- {count}/100 -", (X+5, Y+W+5), (255, 255, 255), 20)
                 else: 
                     text = "Gần thêm chút"
 
@@ -70,8 +71,6 @@ def nhap_khuon_mat(camera = 0, directory = imgdir_path):
 
         # Hiển thị kết quả
         cv2.imshow('Nhap Khuon Mat', frame)
-
-
 
     # Giải phóng camera và đóng tất cả cửa sổ
     cap.release()
