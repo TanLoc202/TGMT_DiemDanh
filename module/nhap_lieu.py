@@ -1,10 +1,11 @@
+
+imgdir_path = "data/images/"
+
+
+#----------
 import os
 import pandas as pd
 from . import database as db
-
-#----------
-imgdir_path = "data/images/"
-#----------
 
 def xoa_anh(code, directory = imgdir_path):
     if os.path.exists(directory):
@@ -95,6 +96,3 @@ def run():
         else:
             print("Lựa chọn sai. vui lhong chon lại")
     db.dong_kn()
-
-if __name__=="__main__":
-    run()
