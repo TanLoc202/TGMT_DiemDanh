@@ -14,10 +14,10 @@ if __name__=="__main__":
     print("4. Chạy chương trình huấn luyện")
     key = int(input("Run>>"))
     if key == 1: 
-        nhan_dien.run()
+        nhan_dien.run(1)
     elif key == 2:
         nhap_lieu.run()
     elif key == 3:
-        nhan_dien.nhap_khuon_mat()
+        nhan_dien.nhap_khuon_mat(1)
     elif key == 4:
         nhan_dien.huan_luyen_model()

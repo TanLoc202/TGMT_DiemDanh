@@ -55,7 +55,7 @@ def nhap_khuon_mat(camera = 0, directory = imgdir_path):
         # Nhận diện từng khuôn mặt
         for (x, y, w, h) in faces:            
             if x > X and y > Y and x+w < X+W and y+h < Y+H:
-                if x < X+40 and y < Y+40 and x+w > X+W-40 and y+h > Y+H-40:
+                if x < X+60 and y < Y+60 and x+w > X+W-60 and y+h > Y+H-60:
                     text = "Giữ Cố Định"
                     color = (20, 200, 20)
                     cv2.imwrite(f"{directory}{mssv}.{count}.jpg", frame[Y:Y+H, X:X+W])
@@ -128,6 +128,8 @@ def xuat_file_diemdanh_ngay(ngay, file_path=""):
 def run(camera = 0):
     recognizer.read(model_path)
     cap = cv2.VideoCapture(camera)
+    oid = 0
+    cid = 0
     while True:
         # Đọc frame từ camera
         ret, frame = cap.read()
@@ -139,21 +141,29 @@ def run(camera = 0):
 
         # Phát hiện khuôn mặt
         faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
-
         # Nhận diện từng khuôn mặt
         for (x, y, w, h) in faces:            
-            cv2.rectangle(frame, (x, y), (x+w, y+h), (255, 0, 0), 2)
-            
-            cv2.rectangle(frame, (x, y-20), (x+w, y), (255, 0, 0), -1)
+            color = (255, 0, 0)
             roi_gray = gray[y:y+h, x:x+w]
             id, confidence = recognizer.predict(roi_gray)
-            if confidence < 50:
+            if confidence < 60:
             # Vẽ khung và hiển thị nhãn
-                db.truy_cap(id)
-                frame = put_vie_text(frame, f"ID: {id}", (x, y-10), (255, 255, 255))
+                text = f"ID: {id}"
+                
+                if oid == id:
+                    cid +=1
+                else:
+                    oid = id
+                    cid = 0
+                if cid == 5:
+                    color = (0, 200, 0)
+                    db.truy_cap(id)
             else: 
-                frame = put_vie_text(frame, f"Không Xác Định", (x, y-10), (255, 255, 255))
+                text = f"Không Xác Định"
 
+            cv2.rectangle(frame, (x, y), (x+w, y+h), color, 2)         
+            cv2.rectangle(frame, (x, y-20), (x+w, y), color, -1)
+            frame = put_vie_text(frame, text, (x, y-20), (255, 255, 255),20)
         # Hiển thị kết quả
         cv2.imshow('Nhan Dien Khuon Mat', frame)
 

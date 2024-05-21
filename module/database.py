@@ -86,17 +86,17 @@ def truy_cap(mssv):
 
 def diemdanh_ngay(ngay):
     cur = conn.cursor()
-    sql = """SELECT 
-    sinhvien.Mssv, 
-    sinhvien.TenSV, 
-    sinhvien.NamSinh, 
-    CASE 
-        WHEN check_in.Ngay = ? THEN 1 
-        ELSE 0 
+    sql = """SELECT DISTINCT
+    sinhvien.Mssv,
+    sinhvien.TenSV,
+    sinhvien.NamSinh,
+    CASE
+        WHEN sinhvien.mssv in (SELECT DISTINCT diemdanh.Mssv
+FROM diemdanh
+WHERE diemdanh.Ngay = ?) THEN 1
+        ELSE 0
     END AS DiemDanh
-    FROM sinhvien
-    LEFT JOIN check_in ON sinhvien.Mssv = check_in.Mssv;
-"""
+FROM sinhvien;"""
     cur.execute(sql, (ngay,))
     return cur.fetchall()      
 
