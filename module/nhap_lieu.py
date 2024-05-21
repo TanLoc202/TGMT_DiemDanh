@@ -1,4 +1,5 @@
 import os
+import pandas as pd
 from . import database as db
 
 #----------
@@ -51,8 +52,8 @@ def run():
         print("=================================================")        
         print("1. Nhập thông tin sinh viên")
         print("2. Nhập sinh viên từ file csv")
-        print("2. Xóa thông tin sinh viên")
-        print("3. Xem danh sách sinh viên")
+        print("3. Xóa thông tin sinh viên")
+        print("4. Xem danh sách sinh viên")
         print("0. Thoát")
         chon = input("Chọn thao tác muốn thực hiện: ")
         print("=================================================")
@@ -66,7 +67,14 @@ def run():
                     break
                 k = input("Bạn có muốn nhập tiếp không? (Y/N): ")
         elif chon == "2":
-            nhap_sinhvien_tu_csv()
+            k = "y"
+            while True:
+                print("-------------------------------------------------")
+                if k.upper() == "Y":
+                    nhap_sinhvien_tu_csv()
+                elif k.upper() == "N":
+                    break
+                k = input("Bạn có muốn tiếp tục? (Y/N): ")
         elif chon == "3":
             k = "y"
             while True:
