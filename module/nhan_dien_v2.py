@@ -6,6 +6,7 @@ import face_recognition
 import os
 import cv2
 import pickle
+from.sp import put_vie_text
 
 def huan_luyen(data_path = imgdir_path, model_path = model_path):
     known_encodings = []
@@ -13,6 +14,8 @@ def huan_luyen(data_path = imgdir_path, model_path = model_path):
 
     print('Đang nhập ảnh')
     for filename in os.listdir(data_path):
+        if int(filename.split(".")[1]) % 40 != 0:#---------------------------------------
+            continue
         image_path = os.path.join(data_path, filename)
         # Đọc ảnh
         image = face_recognition.load_image_file(image_path)
@@ -30,6 +33,8 @@ def huan_luyen(data_path = imgdir_path, model_path = model_path):
 
 def run(camera = 0, model = model_path):
     print("Đang tải dữ liệu")
+    face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
+
     # Tải mã hóa khuôn mặt và ID từ file
     with open(model, "rb") as f:
         known_face_encodings, known_face_ids = pickle.load(f)
@@ -42,35 +47,27 @@ def run(camera = 0, model = model_path):
         ret, frame = cap.read()
         
         # Chuyển đổi frame từ BGR (OpenCV) sang RGB (face_recognition)
-        rgb_frame = frame[:, :, ::-1]
-        
+        rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         # Phát hiện các khuôn mặt trong frame hiện tại
-        face_locations = face_recognition.face_locations(rgb_frame)
-        face_encodings = face_recognition.face_encodings(rgb_frame, face_locations)
-    
+        faces = face_cascade.detectMultiScale(rgb_frame, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
+        # Nhận diện từng khuôn mặt
+        for (x, y, w, h) in faces: 
+            face = rgb_frame[y:y+h, x:x+w]
+            face_encoding = face_recognition.face_encodings(face)
+            if len(face_encoding) > 0:
         # So sánh từng khuôn mặt trong frame với các mã hóa đã biết
-        face_names = []
-        for face_encoding in face_encodings:
-            matches = face_recognition.compare_faces(known_face_encodings, face_encoding)
-            name = "Unknown"
-        
-            # Nếu tìm thấy khớp
-            if True in matches:
-                first_match_index = matches.index(True)
-                name = known_face_ids[first_match_index]
+                matches = face_recognition.compare_faces(known_face_encodings, face_encoding[0])
+                name = "Unknown"
             
-            face_names.append(name)
-    
-        # Hiển thị kết quả
-        for (top, right, bottom, left), name in zip(face_locations, face_names):
-            # Vẽ hình chữ nhật xung quanh khuôn mặt
-            cv2.rectangle(frame, (left, top), (right, bottom), (0, 0, 255), 2)
-            
-            # Vẽ tên người phía dưới khuôn mặt
-            cv2.rectangle(frame, (left, bottom - 35), (right, bottom), (0, 0, 255), cv2.FILLED)
-            font = cv2.FONT_HERSHEY_DUPLEX
-            cv2.putText(frame, name, (left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)
+                # Nếu tìm thấy khớp
+                if True in matches:
+                    first_match_index = matches.index(True)
+                    name = known_face_ids[first_match_index]
         
+                cv2.rectangle(frame, (x, y), (x+w, y+h), (255, 0, 0), 2)         
+                cv2.rectangle(frame, (x, y-20), (x+w, y), (255, 0, 0), -1)
+                frame = put_vie_text(frame, name, (x, y-20), (255, 255, 255),20)
+
         # Hiển thị frame kết quả
         cv2.imshow('Video', frame)
         

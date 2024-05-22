@@ -5,7 +5,6 @@ imgdir_path = "data/images/"
 import os
 import cv2
 import numpy as np
-from PIL import Image
 from .database import truy_cap
 from .sp import put_vie_text, xuat_file_diemdanh_ngay
 from datetime import datetime
@@ -79,23 +78,29 @@ def nhap_khuon_mat(camera = 0, directory = imgdir_path):
 def huan_luyen(data_path = imgdir_path, model_path = model_path):
     if os.path.exists(data_path):
         # Khởi tạo các danh sách để lưu trữ hình ảnh và nhãn
-        faces = []
-        labels = []
+        facelist = []
+        labellist = []
 
         print("Đang load ảnh")
         # Đọc dữ liệu và gắn nhãn
         for image_name in os.listdir(data_path):
+            if int(image_name.split('.')[1])>50:
+                continue
             img_path = os.path.join(data_path, image_name)
-            faceImg = Image.open(img_path).convert('L')
-            faceNp = np.array(faceImg, 'uint8')
-            faces.append(faceNp)
-            labels.append(int(image_name.split('.')[0]))
+            faceImg = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
+            faces = face_cascade.detectMultiScale(faceImg, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
+            # Nhận diện từng khuôn mặt
+            for (x, y, w, h) in faces: 
+                roi_face = faceImg[y:y+h, x:x+w]
+                faceNp = np.array(roi_face, dtype=np.uint8)
+                facelist.append(faceNp)
+                labellist.append(int(image_name.split('.')[0]))
         
-        if labels != []:
+        if labellist != []:
             # Chuyển đổi danh sách thành mảng NumPy
-            labels = np.array(labels)
+            labellist = np.array(labellist)
             print("Đang huấn luyện mô hình")
-            recognizer.train(faces, labels)
+            recognizer.train(facelist, labellist)
             recognizer.save(model_path)
             print(f"Mô hình đã được huấn luyện và lưu vào {model_path}.")
         else:

@@ -14,7 +14,7 @@ if __name__=="__main__":
     print("4. Chạy chương trình huấn luyện")
     key = int(input("Run>>"))
     if key == 1: 
-        nhan_dien_v2.run(1)
+        nhan_dien_v2.run()
     elif key == 2:
         nhap_lieu.run()
     elif key == 3:
